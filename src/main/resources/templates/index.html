@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Kafka Monitor</title>
+</head>
+<body>
+<h1>Last Kafka Message</h1>
+<p id="lastMessage" th:text="${lastMessage}">No messages yet</p>
+
+<script>
+    const lastMessageEl = document.getElementById("lastMessage");
+    const evtSource = new EventSource("/stream");
+
+    evtSource.onmessage = function(event) {
+        lastMessageEl.textContent = event.data;
+    };
+</script>
+</body>
+</html>
