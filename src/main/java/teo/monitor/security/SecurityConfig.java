@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -13,24 +15,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/stream").permitAll()  // SSE endpoint stays public
-                        .anyRequest().authenticated()            // everything else secured
-                )
-                .formLogin(form -> form.permitAll())        // form login
-                .httpBasic(httpBasic -> {});               // lambda required, empty if no customization
+    public UserDetailsService userDetailsService() {
 
-        return http.build();
+        var userDetailsService = new InMemoryUserDetailsManager();
+        var user = User.withUsername("admin").password("admin").authorities("read").build();
+        userDetailsService.createUser(user);
+        return userDetailsService;
     }
 
     @Bean
-    public UserDetailsService users() {
-        UserDetails user = User.withUsername("admin")
-                .password("{noop}password") // no encoder for simplicity
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
     }
 }
