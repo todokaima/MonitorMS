@@ -1,0 +1,18 @@
+services:
+
+  monitor-ms:
+    build: .
+    container_name: monitor-ms
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/llmdatabase
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - project
+
+networks:
+  project:
+    external: true
